@@ -1,7 +1,7 @@
 # Martin King. Created 10 Aug 2023.
 # Linear Discriminant Analysis for classifying stratified methane emission.
 # 1. LDA.
-# 2. PLSR-DA.
+# 2. PLS-DA.
 
 # 1. LDA.------------------------------------------------------------------------
 rm(list=ls())
@@ -105,7 +105,7 @@ boxplot(Z[,2]~data_y[itrain], xlab="", ylab="", main="Discrim Var 2")
 boxplot(Z[,3]~data_y[itrain], xlab="", ylab="", main="Discrim Var 3")
 boxplot(Z[,4]~data_y[itrain], xlab="", ylab="", main="Discrim Var 4")
 
-# 2. PLSR-DA.------------------------------------------------------------------------
+# 2. PLS-DA.------------------------------------------------------------------------
 
 rm(list=ls())
 
@@ -150,16 +150,16 @@ for (b in 1:B)
     data_x_train = data.frame(data.df[itrain, 19:549], data.df$yield[itrain], data.df$dim[itrain])
     data_x_test = data.frame(data.df[-itrain, 19:549], data.df$yield[-itrain], data.df$dim[-itrain])
   
-    ata_x_test <- data_x_test %>%
+    data_x_test <- data_x_test %>%
       rename(data.df.dim.itrain. = data.df.dim..itrain.)
     data_x_test <- data_x_test %>%
       rename(data.df.yield.itrain. = data.df.yield..itrain.)
     
     plsda.out = plsda(x = data_x_train, y = data_y[itrain], ncomp=40)
 
-    ldaout.train = predict(plsda.out, newdata=data_x_train)
+    ldaout.train = predict(plsda.out, newdata=data_x_train, ncomp=40)
     confmat.train = table(ldaout.train, data_y[itrain])
-    ldaout.test = predict(plsda.out, newdata=data_x_test)
+    ldaout.test = predict(plsda.out, newdata=data_x_test, ncomp=40)
     confmat.test = table(ldaout.test, data_y[-itrain])
     
     indx = (b-1)*K+k
