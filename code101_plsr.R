@@ -5,10 +5,6 @@
 # 1. CV. Group measurements by same cows together.
 # 2. Leave one treatment out validation.
 
-rm(list=ls())
-
-data.df = read.csv("/Users/martinpeterking/ucc_courseworks.dir/semester3.dir/data_work.dir/PredMethEMk_DMKComp_cowsinsingleyears_mpkedited.csv", header=T)
-
 # 1. CV. Group measurements by same cows together.---------------
 
 library(caret)
@@ -24,8 +20,8 @@ set.seed(2023)
 # Select AM and/or PM.
 selrow = which(data.df$milking_time==1 | data.df$milking_time==2)
 #selrow = which(data.df$TRT=="Gra")
-#data.df$milkdate = as.Date(data.df$milk_date)
-#selrow = which(format(data.df$milkdate, "%Y")==2022)
+#date.df = data.frame(as.Date(data.df$milk_date))
+#selrow = which(format(date.df, "%Y")==2020)
 datanew.df = data.frame(data.df$avg_ch4_smilk[selrow], data.df$dim[selrow], 
                         data.df$yield[selrow], data.df[selrow,19:ncol(data.df)])
 #datanew.df = data.frame(data.df$avg_ch4_smilk[selrow], data.df$fat[selrow], data.df$protein[selrow], data.df$lactose[selrow])
