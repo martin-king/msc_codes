@@ -17,22 +17,26 @@ data.df = read.csv("/Users/martinpeterking/ucc_courseworks.dir/semester3.dir/dat
 
 set.seed(2023)
 
+# Defining data to use.
 # Select AM and/or PM.
 selrow = which(data.df$milking_time==1 | data.df$milking_time==2)
 #selrow = which(data.df$TRT=="Gra")
 #date.df = data.frame(as.Date(data.df$milk_date))
 #selrow = which(format(date.df, "%Y")==2020)
-datanew.df = data.frame(data.df$avg_ch4_smilk[selrow], data.df$dim[selrow], 
-                        data.df$yield[selrow], data.df[selrow,19:ncol(data.df)])
-#datanew.df = data.frame(data.df$avg_ch4_smilk[selrow], data.df$fat[selrow], data.df$protein[selrow], data.df$lactose[selrow])
+#datanew.df = data.frame(data.df$avg_ch4_smilk[selrow], data.df$dim[selrow], 
+#                        data.df$yield[selrow], data.df[selrow,19:ncol(data.df)])
+datanew.df = data.frame(data.df$avg_ch4_smilk[selrow], data.df$dim[selrow], data.df$yield[selrow], data.df[selrow,19:ncol(data.df)])
 #datanew.df = data.frame(data.df$avg_ch4_smilk[selrow], data.df[selrow,19:ncol(data.df)])
 
+# Group measurements by the same cow together.
 grouping = data.df$TB_NUM[selrow]
+
 # Number of folds.
 K = 4
 # Bootstrap.
 B = 100
 
+# Defining variables to store metrics
 rmse.train.k4 = numeric(K*B)
 rmse.test.k4 = numeric(K*B)
 bias.train.k4 = numeric(K*B)
@@ -51,13 +55,16 @@ for (b in 1:B)
   for (k in 1:K)
   {
     itrain = as.numeric(unlist(folds[k]))
-    # Predicting methane emission from spectra and yield.
+    # Calibration/training.
     pls.model <- plsr(data.df.avg_ch4_smilk.selrow. ~ ., data = datanew.df[itrain, ], 
-                      ncomp = 20, scale = TRUE)
+                     ncomp = 20, scale = FALSE)
     #pls.model <- lm(data.df.avg_ch4_smilk.selrow. ~ ., data = datanew.df[itrain, ])
+    # Prediction.
     pls.train <- predict(pls.model, newdata=datanew.df[itrain, ])
     pls.test <- predict(pls.model, newdata=datanew.df[-itrain, ])
+    
     indx = (b-1)*K+k
+    
     # RMSE.
     rmse.train.k4[indx] =  sqrt(mean((datanew.df[itrain, 1] - pls.train[,,20])^2.0))
     rmse.test.k4[indx] =  sqrt(mean((datanew.df[-itrain, 1] - pls.test[,,20])^2.0))
@@ -75,6 +82,14 @@ for (b in 1:B)
     rpiq.test.k4[indx] = IQR(datanew.df[-itrain, 1])/rmse.test.k4[indx]
   }
 }
+mean(rmse.test.k4)
+sd(rmse.test.k4)
+mean(bias.test.k4)
+sd(bias.test.k4)
+mean(cor.test.k4)
+sd(cor.test.k4)
+mean(rpiq.test.k4)
+sd(rpiq.test.k4)
 
 # 2. Leave one treatment out.---------------------------------------------------
 rm(list=ls())
@@ -86,8 +101,9 @@ library(pls)
 
 #set.seed(2023)
 
-selrow = which(data.df$TRT=="Gra")
-data.df = data.df[-selrow, ]
+# Defining data to use.
+#selrow = which(data.df$TRT=="Gra")
+#data.df = data.df[-selrow, ]
 datanew.df = data.frame(data.df$avg_ch4_smilk, 
                         data.df$dim, 
                         data.df$yield,
@@ -95,12 +111,12 @@ datanew.df = data.frame(data.df$avg_ch4_smilk,
 #datanew.df = data.frame(data.df$avg_ch4_smilk,
 #                        data.df[,19:ncol(data.df)])
 
-#treatment=c("C15", "G25", "Gra", "HHG", "HLG", "LHG", "LLG")
-treatment= c("C15", "G25", "HHG", "HLG", "LHG", "LLG")
+treatment=c("C15", "G25", "Gra", "HHG", "HLG", "LHG", "LLG")
+#treatment= c("C15", "G25", "HHG", "HLG", "LHG", "LLG")
 
 # 7 treatments.
-#K=7
-K=6
+K=7
+#K=6
 
 rmse.train.k4 = numeric(K)
 rmse.test.k4 = numeric(K)
@@ -116,10 +132,13 @@ rpiq.test.k4 = numeric(K)
 for (k in 1:K)
 {
   itest = which(data.df$TRT==treatment[k])
-  # Predicting methane emission.
+  
+  # Calibration/training.
   pls.model <- plsr(data.df.avg_ch4_smilk ~ ., data = datanew.df[-itest, ], ncomp = 20, scale = TRUE)
+  # Prediction.
   pls.train <- predict(pls.model, newdata=datanew.df[-itest, ])
   pls.test <- predict(pls.model, newdata=datanew.df[itest, ])
+  
   # RMSE.
   rmse.train.k4[k] =  sqrt(mean((datanew.df[-itest, 1] - pls.train[,,20])^2.0))
   rmse.test.k4[k] =  sqrt(mean((datanew.df[itest, 1] - pls.test[,,20])^2.0))
