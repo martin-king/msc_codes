@@ -27,6 +27,7 @@ data.train.df = data.new.df
 
 # The 'standard' linear regression.
 lm.model <- lm(avg_ch4_smilk ~ yield + dim, data=data.train.df)
+# Zero slopes
 lme.model.reduced <- lmer(avg_ch4_smilk ~ 1 + (1 | tb_num), data=data.train.df, )
 lme.model <- lmer(avg_ch4_smilk ~ yield + dim + (1 | tb_num), data=data.train.df)
 
