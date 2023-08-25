@@ -3,6 +3,7 @@
 # Redone with 218 cows that appeared in single years only.
 # PLSR.
 # 1. CV. Group measurements by same cows together.
+# 1.5 Model diagnostics.
 # 2. Leave one treatment out validation.
 
 # 1. CV. Group measurements by same cows together.---------------
@@ -20,12 +21,12 @@ set.seed(2023)
 # Defining data to use.
 # Select AM and/or PM.
 selrow = which(data.df$milking_time==1 | data.df$milking_time==2)
-#selrow = which(data.df$TRT=="Gra")
+#selrow = which(data.df$TRT!="Gra")
 #date.df = data.frame(as.Date(data.df$milk_date))
 #selrow = which(format(date.df, "%Y")==2020)
-#datanew.df = data.frame(data.df$avg_ch4_smilk[selrow], data.df$dim[selrow], 
-#                        data.df$yield[selrow], data.df[selrow,19:ncol(data.df)])
-datanew.df = data.frame(data.df$avg_ch4_smilk[selrow], data.df$dim[selrow], data.df$yield[selrow], data.df[selrow,19:ncol(data.df)])
+datanew.df = data.frame(data.df$avg_ch4_smilk[selrow], data.df$dim[selrow], 
+                        data.df$yield[selrow], data.df$sd_ch4_smilk[selrow], data.df[selrow,19:ncol(data.df)])
+#datanew.df = data.frame(data.df$avg_ch4_smilk[selrow], data.df$yield[selrow], data.df$dim[selrow])
 #datanew.df = data.frame(data.df$avg_ch4_smilk[selrow], data.df[selrow,19:ncol(data.df)])
 
 # Group measurements by the same cow together.
@@ -90,6 +91,56 @@ mean(cor.test.k4)
 sd(cor.test.k4)
 mean(rpiq.test.k4)
 sd(rpiq.test.k4)
+
+# 1.5 Model diagnostics.--------------------------------------------------------
+
+library(pls)
+
+rm(list=ls())
+
+# Read edited file. 
+data.df = read.csv("/Users/martinpeterking/ucc_courseworks.dir/semester3.dir/data_work.dir/PredMethEMk_DMKComp_cowsinsingleyears_mpkedited.csv", header=T)
+
+#datanew.df = data.frame(data.df$avg_ch4_smilk, data.df$yield, data.df$dim, data.df[,19:ncol(data.df)])
+
+#pls.model <- plsr(data.df.avg_ch4_smilk ~ ., data = datanew.df, ncomp = 20, scale = FALSE)
+
+datanew.df = data.frame(data.df$avg_ch4_smilk, data.df$yield, data.df$dim)
+lm.model <- lm(data.df.avg_ch4_smilk ~ ., data = datanew.df)
+
+par(mfrow=c(2,2))
+par(cex.main = 1.5)
+par(cex.axis = 1.4) 
+par(cex.lab = 1.4)
+par(mar = c(5, 5, 4, 2)) #Bottom, then clockwise.
+
+library(scales)
+# Residuals vs. fitted values.
+#plot(pls.model$fitted.values[,,20], pls.model$residuals[,,20], main="Residuals vs. fitted values", xlab="Fitted values", ylab="Residuals", col = alpha("black", 0.3))
+#plot(lm.model$fitted.values, lm.model$residuals, main="Residuals vs. fitted values", xlab="Fitted values", ylab="Residuals", col = alpha("black", 0.3))
+plot(lm.model, which=1, col = alpha("black", 0.3))
+#abline(h = 0, col = "coral1", lwd = 2)
+
+#qqnorm(pls.model$residuals[,,20], pch=16, col = alpha("black", 0.3))
+#qqline(pls.model$residuals[,,20])
+qqnorm(lm.model$residuals, pch=16, col = alpha("black", 0.3))
+qqline(lm.model$residuals)
+
+#plot(data.df$yield, pls.model$residuals[,,20], main="Residuals vs. yield", xlab="yield", ylab="Residuals", col = alpha("black", 0.3))
+plot(data.df$yield, lm.model$residuals, main="Residuals vs. yield", xlab="yield", ylab="Residuals", col = alpha("black", 0.3))
+abline(h = 0, col = "coral1", lwd = 2)
+
+#plot(data.df$dim, pls.model$residuals[,,20], main="Residuals vs. dim", xlab="dim", ylab="Residuals", col = alpha("black", 0.3))
+plot(data.df$dim, lm.model$residuals, main="Residuals vs. dim", xlab="dim", ylab="Residuals", col = alpha("black", 0.3))
+abline(h = 0, col = "coral1", lwd = 2)
+
+# Partial residuals plot
+#library(car)
+#datanew.df = data.frame(data.df$avg_ch4_smilk, data.df$yield, data.df$dim)
+#pls.model <- lm(data.df.avg_ch4_smilk ~ ., data = datanew.df)
+#crPlots(pls.model, terms = ~ data.df.yield)
+#crPlots(pls.model, terms = ~ data.df.dim)
+
 
 # 2. Leave one treatment out.---------------------------------------------------
 rm(list=ls())
