@@ -36,7 +36,7 @@ grouping = data.df$TB_NUM[selrow]
 # Number of folds.
 K = 4
 # Bootstrap.
-B = 10
+B = 100
 
 # Defining variables to store metrics
 rmse.train.k4 = numeric(K*B)
@@ -126,7 +126,7 @@ plot(lm.model, which=2, col = alpha("black", 0.3), main="(b)")
 plot(lm.model, which=4, col = alpha("black", 0.3), main="(c)")
 
 #Cook's Distance vs. Leverage (h/1-h)
-plot(lm.model, which=5, col = alpha("black", 0.3), main="(d)")
+plot(lm.model, which=6, col = alpha("black", 0.3), main="(d)")
 
 # Residuals vs. fitted values.
 #plot(pls.model$fitted.values[,,20], pls.model$residuals[,,20], main="Residuals vs. fitted values", xlab="Fitted values", ylab="Residuals", col = alpha("black", 0.3))
