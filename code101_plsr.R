@@ -108,19 +108,29 @@ pls.model <- plsr(data.df.avg_ch4_smilk ~ ., data = datanew.df, ncomp = 20, scal
 datanew.df = data.frame(data.df$avg_ch4_smilk, data.df$yield, data.df$dim)
 lm.model <- lm(data.df.avg_ch4_smilk ~ ., data = datanew.df)
 
-par(mfrow=c(3,2))
+par(mfrow=c(2,2))
 par(cex.main = 1.5)
 par(cex.axis = 1.4) 
 par(cex.lab = 1.4)
 par(mar = c(5, 5, 4, 2)) #Bottom, then clockwise.
 
 library(scales)
+
+# Residuals vs. Fitted values
+plot(lm.model, which=1, col = alpha("black", 0.3), main="(a)")
+
+# QQ plot
+plot(lm.model, which=2, col = alpha("black", 0.3), main="(b)")
+
+#Cook's Distance
+plot(lm.model, which=4, col = alpha("black", 0.3), main="(c)")
+
+#Cook's Distance vs. Leverage (h/1-h)
+plot(lm.model, which=5, col = alpha("black", 0.3), main="(d)")
+
 # Residuals vs. fitted values.
 #plot(pls.model$fitted.values[,,20], pls.model$residuals[,,20], main="Residuals vs. fitted values", xlab="Fitted values", ylab="Residuals", col = alpha("black", 0.3))
 #plot(lm.model$fitted.values, lm.model$residuals, main="Residuals vs. fitted values", xlab="Fitted values", ylab="Residuals", col = alpha("black", 0.3))
-
-# Residuals vs. Fitted values
-plot(lm.model, which=1, col = alpha("black", 0.3))
 #abline(h = 0, col = "coral1", lwd = 2)
 
 #qqnorm(pls.model$residuals[,,20], pch=16, col = alpha("black", 0.3))
@@ -128,22 +138,14 @@ plot(lm.model, which=1, col = alpha("black", 0.3))
 #qqnorm(lm.model$residuals, pch=16, col = alpha("black", 0.3))
 #qqline(lm.model$residuals)
 
-# QQ plot
-plot(lm.model, which=2, col = alpha("black", 0.3))
 
 #plot(data.df$yield, pls.model$residuals[,,20], main="Residuals vs. yield", xlab="yield", ylab="Residuals", col = alpha("black", 0.3))
-plot(data.df$yield, lm.model$residuals, main="Residuals vs. yield", xlab="yield", ylab="Residuals", col = alpha("black", 0.3))
-abline(h = 0, col = "coral1", lwd = 2)
+#plot(data.df$yield, lm.model$residuals, main="Residuals vs. yield", xlab="yield", ylab="Residuals", col = alpha("black", 0.3))
+#abline(h = 0, col = "coral1", lwd = 2)
 
 #plot(data.df$dim, pls.model$residuals[,,20], main="Residuals vs. dim", xlab="dim", ylab="Residuals", col = alpha("black", 0.3))
-plot(data.df$dim, lm.model$residuals, main="Residuals vs. dim", xlab="dim", ylab="Residuals", col = alpha("black", 0.3))
-abline(h = 0, col = "coral1", lwd = 2)
-
-#Cook's Distance
-plot(lm.model, which=4, col = alpha("black", 0.3))
-
-#Cook's Distance vs. Leverage
-plot(lm.model, which=6, col = alpha("black", 0.3))
+#plot(data.df$dim, lm.model$residuals, main="Residuals vs. dim", xlab="dim", ylab="Residuals", col = alpha("black", 0.3))
+#abline(h = 0, col = "coral1", lwd = 2)
 
 # Partial residuals plot
 #library(car)
